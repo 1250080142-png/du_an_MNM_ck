@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmetics Shop - Trang Chủ</title>
+    <style>
+        /* --- Nền tảng & Màu sắc chủ đạo --- */
+        :root {
+            --pink-main: #f06292;
+            --pink-light: #fce4ec;
+            --gray-bg: #f8f9fa;
+            --text-dark: #333;
+            --price-red: #d9534f;
+            --btn-green: #5cb85c;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            margin: 0; 
+            background-color: var(--gray-bg); 
+            color: var(--text-dark);
+        }
+
+        /* --- Header / Navbar --- */
+        header {
+            background-color: var(--pink-main);
+            color: white;
+            padding: 10px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .logo { font-size: 1.5rem; font-weight: bold; text-transform: uppercase; }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* --- Container chính --- */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 15px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            padding-left: 10px;
+            border-left: 5px solid var(--pink-main);
+        }
+
+        /* --- Grid Sản phẩm (Dàn trang 3 cột như hình) --- */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #eee;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        }
+
+        /* --- Hình ảnh sản phẩm --- */
+        .image-wrapper {
+            width: 100%;
+            height: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .product-card img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+        }
+
+        /* --- Thông tin sản phẩm --- */
+        .product-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 10px 0;
+            min-height: 2.4em;
+            color: #444;
+            text-decoration: none;
+            display: block;
+        }
+
+        .price {
+            font-size: 1.3rem;
+            color: var(--price-red);
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .detail-link {
+            font-size: 0.85rem;
+            color: #007bff;
+            text-decoration: none;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        /* --- Nút bấm Thêm vào giỏ --- */
+        .btn-add {
+            background-color: var(--btn-green);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .btn-add:hover { background-color: #4cae4c; }
+
+        .auth-notice {
+            font-size: 0.8rem;
+            color: #888;
+            font-style: italic;
+        }
+
+        .quantity-input {
+            width: 60px;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">COSMETICSHOP</div>
+        <div class="nav-links">
+            <a th:href="@{/}">TRANG CHỦ</a>
+            <a th:href="@{/orders}">ĐƠN HÀNG</a>
+            
+            <a th:href="@{/login}" sec:authorize="!isAuthenticated()">Đăng nhập</a>
+            <a th:href="@{/register}" sec:authorize="!isAuthenticated()">Đăng ký</a>
+            
+            <a th:href="@{/cart}" sec:authorize="isAuthenticated()">Giỏ hàng 🛒</a>
+            <a th:href="@{/admin/products}" sec:authorize="hasRole('ADMIN')">Quản trị</a>
+            <a th:href="@{/logout}" sec:authorize="isAuthenticated()">Đăng xuất</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2 class="section-title">Sản phẩm Nổi bật</h2>
+        
+        <div class="product-grid">
+            <div th:each="product : ${products}" class="product-card">
+                
+                <div class="image-wrapper">
+				    <!-- Kiểm tra nếu có ảnh -->
+				    <img th:if="${product.imageUrl != null and product.imageUrl != ''}" 
+				         th:src="${#strings.startsWith(product.imageUrl, '/images/')} ? @{${product.imageUrl}} : @{'/images/' + ${product.imageUrl}}" 
+				         alt="Ảnh sản phẩm">
+				    
+				    <!-- Nếu không có ảnh thì dùng ảnh mặc định no-image.png -->
+				    <img th:unless="${product.imageUrl != null and product.imageUrl != ''}" 
+				         th:src="@{/images/no-image.png}" 
+				         alt="Không có ảnh">
+				</div>
+                
+                <div class="product-info">
+                    <a th:href="@{'/products/' + ${product.id}}" 
+                       class="product-name" 
+                       th:text="${product.name}">Tên Sản phẩm</a>
+                    
+                    <p class="price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' VND'}">200.000 VND</p>
+                    
+                    <a th:href="@{'/products/' + ${product.id}}" class="detail-link">Xem chi tiết</a>
+                    
+                    <form th:action="@{/cart/add}" method="post">
+                        <input type="hidden" name="productId" th:value="${product.id}" /> 
+                        
+                        <div sec:authorize="isAuthenticated()">
+                            <input type="number" name="quantity" value="1" min="1" class="quantity-input" required />
+                            <button type="submit" class="btn-add">Thêm vào giỏ</button>
+                        </div>
+                        
+                        <div sec:authorize="!isAuthenticated()" class="auth-notice">
+                            Vui lòng đăng nhập để mua hàng
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
