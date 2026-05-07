@@ -19,11 +19,17 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
         
         Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
 
-        // Kiểm tra nếu có quyền ROLE_ADMIN thì đi tới trang quản trị
+        System.out.println("--- DEBUG LOGIN ---");
+        System.out.println("User: " + authentication.getName());
+        System.out.println("Roles: " + roles);
+        
+        // Ép kiểu chuyển hướng tuyệt đối
         if (roles.contains("ROLE_ADMIN")) {
-            response.sendRedirect("/admin");
+            System.out.println("Redirecting to: /admin");
+            response.sendRedirect(request.getContextPath() + "/admin");
         } else {
-            response.sendRedirect("/");
+            System.out.println("Redirecting to: /");
+            response.sendRedirect(request.getContextPath() + "/");
         }
     }
 }
