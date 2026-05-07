@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý sản phẩm - Admin Cosmetic</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; background-color: #f8f9fa; }
+
+        /* --- SIDEBAR (Bên trái) --- */
+        .sidebar { width: 250px; background-color: #34495e; color: white; min-height: 100vh; position: fixed; }
+        .sidebar-header { background-color: #f06292; padding: 20px; font-weight: bold; text-align: center; font-size: 1.2rem; }
+        .sidebar-menu { list-style: none; padding: 0; margin: 0; }
+        .sidebar-menu li a { 
+            display: block; padding: 15px 20px; color: #bdc3c7; text-decoration: none; transition: 0.3s;
+        }
+        .sidebar-menu li a:hover, .sidebar-menu li.active a { background-color: #2c3e50; color: white; }
+        .sidebar-menu li a i { margin-right: 10px; width: 20px; }
+
+        /* --- MAIN CONTENT (Bên phải) --- */
+        .main-content { margin-left: 250px; flex: 1; padding: 30px; }
+
+        .product-card {
+            background: white; border-radius: 15px; padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .header-row h2 { margin: 0; font-size: 1.5rem; display: flex; align-items: center; gap: 10px; color: #333; }
+
+        .btn-add-new {
+            background-color: #f06292; color: white; padding: 10px 20px;
+            border-radius: 8px; text-decoration: none; font-weight: bold;
+        }
+
+        /* --- TABLE STYLE --- */
+        .product-table { width: 100%; border-collapse: collapse; }
+        .product-table th { text-align: left; padding: 15px; color: #666; border-bottom: 2px solid #f8f9fa; font-size: 0.9rem; text-transform: uppercase; }
+        .product-table td { padding: 15px; border-bottom: 1px solid #f8f9fa; vertical-align: middle; color: #444; }
+
+        .img-thumbnail { width: 60px; height: 60px; object-fit: cover; border-radius: 10px; border: 1px solid #eee; }
+        .badge-category { 
+            background-color: #e3f2fd; color: #2196f3; padding: 5px 12px; 
+            border-radius: 15px; font-size: 0.7rem; font-weight: bold; 
+        }
+        .price-text { color: #27ae60; font-weight: bold; }
+        .action-btns { display: flex; gap: 15px; }
+        .action-btns a { color: #f06292; font-size: 1.1rem; }
+        .btn-delete { color: #e74c3c !important; }
+    </style>
+</head>
+<body>
+
+    <!-- 1. SIDEBAR GIỐNG HÌNH 1 -->
+    <div class="sidebar">
+        <div class="sidebar-header">ADMIN COSMETIC</div>
+        <ul class="sidebar-menu">
+            <li><a th:href="@{/admin}"><i class="fa fa-home"></i> Tổng quan</a></li>
+            <li class="active"><a th:href="@{/admin/products}"><i class="fa fa-box"></i> Quản lý sản phẩm</a></li>
+            <li><a th:href="@{/admin/categories}"><i class="fa fa-list"></i> Quản lý danh mục</a></li>
+            <li><a th:href="@{/admin/inventory}"><i class="fa fa-warehouse"></i> Quản lý kho</a></li>
+            <li><a th:href="@{/admin/orders}"><i class="fa fa-shopping-cart"></i> Đơn hàng</a></li>
+            <li><a th:href="@{/admin/users}"><i class="fa fa-users"></i> Quản lý User</a></li>
+            <li><a th:href="@{/}"><i class="fa fa-eye"></i> Xem trang chủ</a></li>
+        </ul>
+    </div>
+
+    <!-- 2. NỘI DUNG CHÍNH -->
+    <div class="main-content">
+        <div class="product-card">
+            <div class="header-row">
+                <h2><i class="fa fa-boxes"></i> Quản lý Sản Phẩm</h2>
+                <a th:href="@{/admin/products/add}" class="btn-add-new">
+                    <i class="fa fa-plus"></i> Thêm mới
+                </a>
+            </div>
+
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Hình ảnh</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Danh mục</th>
+                        <th>Giá bán</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- SỬA LỖI: Lặp qua danh sách 'products' thay vì gọi trực tiếp 'product' -->
+                    <tr th:each="p : ${products}">
+                        <td th:text="${p.id}"></td>
+                        <td>
+                            <img th:if="${p.imageUrl != null and p.imageUrl != ''}" 
+								         th:src="${#strings.startsWith(p.imageUrl, '/images/')} ? @{${p.imageUrl}} : @{'/images/' + ${p.imageUrl}}" 
+								         style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd;">
+								    
+								    <img th:unless="${p.imageUrl != null and p.imageUrl != ''}" 
+								         th:src="@{/images/no-image.png}" 
+								         style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd;">
+                        </td>
+                        <td><strong th:text="${p.name}"></strong></td>
+                        <td>
+                            <span class="badge-category" th:text="${p.category?.name ?: 'CHƯA CÓ'}"></span>
+                        </td>
+                        <td>
+                            <span class="price-text" th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <a th:href="@{/admin/products/edit/{id}(id=${p.id})}" title="Sửa"><i class="fa fa-edit"></i></a>
+                                <a th:href="@{/admin/products/delete/{id}(id=${p.id})}" class="btn-delete" 
+                                   onclick="return confirm('Bạn có chắc muốn xóa?')" title="Xóa"><i class="fa fa-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

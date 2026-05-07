@@ -19,13 +19,23 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    	System.out.println("===> Đang đăng nhập user: " + username);
+    	
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng: " + username));
+        System.out.println("===> Mật khẩu lấy từ DB là: " + user.getPasswordHash());
+        System.out.println("===> Quyền (Role) lấy từ DB là: " + user.getRole());
         
+        // Kiểm tra xem role trong DB có sẵn chữ "ROLE_" chưa
+        String roleName = user.getRole();
+        if (!roleName.startsWith("ROLE_")) {
+            roleName = "ROLE_" + roleName;
+        }
+
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(), 
                 user.getPasswordHash(), 
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole()))
+                Collections.singletonList(new SimpleGrantedAuthority(roleName))
         );
     }
 }

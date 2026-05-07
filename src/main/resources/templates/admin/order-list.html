@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
+      th:replace="~{admin/layout :: main-layout(~{::section})}">
+<body>
+<section>
+    <div class="card">
+        <h2><i class="fas fa-shopping-cart"></i> Danh sách đơn hàng</h2>
+        <hr>
+        <table class="table" style="width: 100%; margin-top: 20px; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f8f9fa; text-align: left;">
+                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">Mã ĐH</th>
+                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">Khách hàng</th>
+                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">Ngày đặt</th>
+                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">Tổng tiền</th>
+                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">Trạng thái</th>
+                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="order : ${orders}">
+    <td style="padding: 12px;" th:text="${'#' + order.id}"></td>
+    <td style="padding: 12px;" th:text="${order.receiverName}"></td>
+    <td style="padding: 12px;" th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}"></td>
+    <td style="padding: 12px; font-weight: bold;" 
+        th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT') + 'đ'}"></td>
+    <td style="padding: 12px;">
+        <span style="padding: 5px 10px; border-radius: 15px; background: #e3f2fd; color: #1976d2;"
+              th:text="${order.status}"></span>
+    </td>
+    <td style="padding: 12px;">
+        <!-- ĐÃ SỬA: Thêm /detail/ vào đường dẫn -->
+        <a th:href="@{'/admin/orders/detail/' + ${order.id}}" style="color: #e91e63; text-decoration: none;">
+            <i class="fas fa-eye"></i> Xem chi tiết
+        </a>
+    </td>
+</tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>
