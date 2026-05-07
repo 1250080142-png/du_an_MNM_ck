@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
+      th:replace="~{admin/layout :: main-layout(~{::section})}">
+<body>
+<section>
+    <div class="card" style="max-width: 600px; margin: auto;">
+        <h2 th:text="${category.id == null ? 'Thêm danh mục mới' : 'Chỉnh sửa danh mục'}"></h2>
+        <hr>
+        
+        <form th:action="@{/admin/categories/save}" th:object="${category}" method="post">
+            <input type="hidden" th:field="*{id}">
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: bold;">Tên danh mục:</label>
+                <input type="text" th:field="*{name}" class="form-control" 
+                       style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+                       placeholder="Ví dụ: Son môi, Kem dưỡng da..." required>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" class="btn" 
+                        style="background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                    <i class="fas fa-save"></i> Lưu danh mục
+                </button>
+                <a th:href="@{/admin/categories}" 
+                   style="background: #ccc; color: #333; text-decoration: none; padding: 10px 20px; border-radius: 5px;"> Hủy</a>
+            </div>
+        </form>
+    </div>
+</section>
+</body>
+</html>

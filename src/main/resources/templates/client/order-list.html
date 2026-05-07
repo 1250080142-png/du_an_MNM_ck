@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử Đơn hàng - Cosmetic Shop</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --pink-main: #f06292;
+            --pink-hover: #d81b60;
+            --pink-bg: #fdf2f5;
+            --text-dark: #333;
+            --text-gray: #666;
+            --success: #27ae60;
+            --pending: #f39c12;
+            --border-radius: 12px;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            background-color: #f8f9fa; 
+            color: var(--text-dark);
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--pink-main);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 40px;
+        }
+
+        /* --- Thông báo trống --- */
+        .empty-orders {
+            text-align: center;
+            background: white;
+            padding: 50px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .empty-orders i { font-size: 4rem; color: #ccc; margin-bottom: 20px; }
+
+        /* --- Thẻ Đơn hàng --- */
+        .order-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+            transition: transform 0.2s;
+        }
+        .order-card:hover { transform: translateY(-3px); }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--pink-bg);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .order-id { font-size: 1.2rem; font-weight: bold; color: var(--pink-main); }
+        
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-pending { background: #fff4e5; color: var(--pending); }
+        .status-completed { background: #e8f5e9; color: var(--success); }
+
+        .order-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+        .order-info p { margin: 5px 0; color: var(--text-gray); }
+        .order-info strong { color: var(--text-dark); }
+
+        /* --- Bảng chi tiết sản phẩm --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        th {
+            text-align: left;
+            background: var(--pink-bg);
+            color: var(--pink-main);
+            padding: 12px;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .total-amount {
+            text-align: right;
+            margin-top: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--pink-main);
+        }
+
+        /* --- Điều hướng --- */
+        .back-nav {
+            margin-top: 40px;
+            text-align: center;
+        }
+        .btn-back {
+            text-decoration: none;
+            color: var(--text-gray);
+            font-weight: 500;
+            transition: 0.3s;
+        }
+        .btn-back:hover { color: var(--pink-main); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1><i class="fa fa-history"></i> Lịch sử Đơn hàng</h1>
+
+        <div th:if="${orders.isEmpty()}" class="empty-orders">
+            <i class="fa fa-box-open"></i>
+            <p>Bạn chưa thực hiện đơn hàng nào.</p>
+            <a th:href="@{/}" class="btn-back" style="color: var(--pink-main); text-decoration: underline;">Bắt đầu mua sắm ngay</a>
+        </div>
+
+        <div th:each="order : ${orders}" class="order-card">
+            <div class="order-header">
+                <span class="order-id">Mã đơn: #<span th:text="${order.id}">1001</span></span>
+                <span th:classappend="${order.status == 'PENDING' ? 'status-pending' : 'status-completed'}" 
+                      class="status-badge" 
+                      th:text="${order.status}">PENDING</span>
+            </div>
+
+            <div class="order-info">
+                <div>
+                    <p><i class="fa fa-calendar-alt"></i> Ngày đặt: <strong th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}"></strong></p>
+                    <p><i class="fa fa-map-marker-alt"></i> Địa chỉ: <strong th:text="${order.shippingAddress}"></strong></p>
+                </div>
+                <div style="text-align: right;">
+                    <p>Phương thức: <strong>Thanh toán khi nhận hàng</strong></p>
+                </div>
+            </div>
+
+            <h4>Chi tiết sản phẩm:</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th style="text-align: center;">Số lượng</th>
+                        <th style="text-align: right;">Giá đặt</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${order.items}">
+                        <td th:text="${item.product.name}">Tên SP</td>
+                        <td style="text-align: center;" th:text="${item.quantity}">1</td>
+                        <td style="text-align: right;" 
+                            th:text="${#numbers.formatDecimal(item.priceAtOrder, 0, 'COMMA', 0, 'POINT') + 'đ'}"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="total-amount">
+                Tổng thanh toán: <span th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT') + ' VND'}"></span>
+            </div>
+        </div>
+
+        <div class="back-nav">
+            <a th:href="@{/}" class="btn-back"><i class="fa fa-arrow-left"></i> Quay lại Trang chủ</a>
+        </div>
+    </div>
+
+</body>
+</html>

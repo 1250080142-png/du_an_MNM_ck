@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán - Cosmetic Shop</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --pink-main: #f06292;
+            --pink-light: #fdf2f5;
+            --pink-hover: #d81b60;
+            --text-dark: #333;
+            --text-gray: #666;
+            --bg-gray: #f8f9fa;
+            --success-green: #27ae60;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            background-color: var(--bg-gray); 
+            color: var(--text-dark);
+            padding: 40px 20px;
+        }
+
+        .checkout-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 30px;
+        }
+
+        h1 {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: var(--pink-main);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            border-left: 4px solid var(--pink-main);
+            padding-left: 15px;
+            margin-bottom: 25px;
+            color: var(--text-dark);
+        }
+
+        /* --- Section: Order Summary (Table) --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        td {
+            padding: 15px 0;
+            border-bottom: 1px solid #f9f9f9;
+        }
+
+        .total-row td {
+            border-top: 2px solid var(--pink-light);
+            border-bottom: none;
+            padding-top: 20px;
+        }
+
+        .final-price {
+            font-size: 1.4rem;
+            color: var(--pink-main);
+            font-weight: bold;
+        }
+
+        /* --- Section: Shipping Form --- */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-gray);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box; /* Quan trọng để không bị tràn */
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--pink-main);
+            outline: none;
+            box-shadow: 0 0 5px rgba(240, 98, 146, 0.2);
+        }
+
+        .btn-confirm {
+            background: var(--success-green);
+            color: white;
+            border: none;
+            padding: 18px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        .btn-confirm:hover {
+            background: #219150;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .back-link:hover {
+            color: var(--pink-main);
+        }
+
+        /* Icon trang trí */
+        .icon-box {
+            color: var(--pink-main);
+            margin-right: 10px;
+        }
+
+        @media (max-width: 850px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="checkout-container">
+        <h1><i class="fa fa-credit-card icon-box"></i> Thanh toán đơn hàng</h1>
+
+        <div class="card">
+            <h2><i class="fa fa-truck icon-box"></i> Thông tin giao hàng</h2>
+            <form th:action="@{/placeOrder}" th:object="${order}" method="post">
+                
+                <div class="form-group">
+                    <label>Tên người nhận:</label>
+                    <input type="text" th:field="*{receiverName}" placeholder="Nhập họ và tên" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Địa chỉ giao hàng:</label>
+                    <input type="text" th:field="*{shippingAddress}" placeholder="Số nhà, tên đường, Phường/Xã..." required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Số điện thoại:</label>
+                    <input type="text" th:field="*{receiverPhone}" placeholder="Nhập số điện thoại liên hệ" required>
+                </div>
+                
+                <button type="submit" class="btn-confirm">
+                    <i class="fa fa-check-circle"></i> XÁC NHẬN ĐẶT HÀNG
+                </button>
+            </form>
+            
+            <a th:href="@{/cart}" class="back-link"><i class="fa fa-arrow-left"></i> Quay lại Giỏ hàng</a>
+        </div>
+
+        <div class="card">
+            <h2><i class="fa fa-receipt icon-box"></i> Tóm tắt đơn hàng</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th style="text-align: center;">SL</th>
+                        <th style="text-align: right;">Tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${cart.items}">
+                        <td>
+                            <div style="font-weight: 500;" th:text="${item.product.name}">Tên SP</div>
+                            <div style="font-size: 0.8rem; color: #999;" 
+                                 th:text="${#numbers.formatDecimal(item.product.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">Giá</div>
+                        </td>
+                        <td style="text-align: center;" th:text="${item.quantity}">1</td>
+                        <td style="text-align: right; font-weight: 500;" 
+                            th:text="${#numbers.formatDecimal(item.product.price * item.quantity, 0, 'COMMA', 0, 'POINT') + 'đ'}">450.000đ</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="2"><strong>Tổng thanh toán:</strong></td>
+                        <td style="text-align: right;">
+                            <span class="final-price" th:text="${#numbers.formatDecimal(totalAmount, 0, 'COMMA', 0, 'POINT') + 'đ'}">450.000đ</span>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div style="margin-top: 25px; font-size: 0.85rem; color: #888; background: #fdfdfd; padding: 15px; border-radius: 8px; border: 1px dashed #ddd;">
+                <i class="fa fa-info-circle"></i> Quý khách vui lòng kiểm tra kỹ thông tin trước khi nhấn xác nhận. Đơn hàng sẽ được giao trong vòng 2-3 ngày làm việc.
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

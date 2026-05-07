@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/layout :: main-layout(~{::section})}">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <section>
+        <div class="card" style="max-width: 800px; margin: 0 auto; padding: 30px;">
+            <h2 style="color: var(--primary); margin-bottom: 20px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px;">
+                <i class="fas fa-box-open"></i> <span th:text="${pageTitle}">Thêm sản phẩm mới</span>
+            </h2>
+
+            <form th:action="@{/admin/products/save}" th:object="${product}" method="post" enctype="multipart/form-data">
+                <input type="hidden" th:field="*{id}">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="font-weight: bold; display: block; margin-bottom: 5px;">Tên sản phẩm (*):</label>
+                            <input type="text" th:field="*{name}" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label style="font-weight: bold; display: block; margin-bottom: 5px;">Danh mục (*):</label>
+                            <select th:field="*{category.id}" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                                <option value="">-- Chọn danh mục --</option>
+                                <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                            </select>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label style="font-weight: bold; display: block; margin-bottom: 5px;">Giá bán (VNĐ) (*):</label>
+                            <input type="number" th:field="*{price}" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                        </div>
+                    </div>
+
+                    <div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="font-weight: bold; display: block; margin-bottom: 5px;">Hình ảnh sản phẩm:</label>
+                            
+                            <input type="file" id="fileImage" name="imageProduct" accept="image/png, image/jpeg, image/webp" 
+                                   style="width: 100%; padding: 8px; border: 1px dashed #ccc; border-radius: 5px; background: #f9f9f9;">
+                            
+                            <div style="margin-top: 15px; text-align: center; border: 1px solid #eee; padding: 10px; border-radius: 10px; background: #fff;">
+                                <img id="thumbnail" alt="Xem trước ảnh" 
+								     th:src="${product.imageUrl != null and product.imageUrl != ''} 
+								               ? (${#strings.startsWith(product.imageUrl, '/images/')} ? @{${product.imageUrl}} : @{'/images/' + ${product.imageUrl}}) 
+								               : 'https://via.placeholder.com/200x200?text=Chưa+có+ảnh'"
+								     style="max-width: 100%; height: 200px; object-fit: contain; border-radius: 8px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px; margin-top: 10px;">
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Mô tả sản phẩm:</label>
+                    <textarea th:field="*{description}" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+                </div>
+
+                <div style="text-align: right; border-top: 1px solid #eee; padding-top: 20px;">
+                    <a th:href="@{/admin/products}" style="padding: 10px 20px; color: #666; text-decoration: none; margin-right: 15px;">Hủy bỏ</a>
+                    <button type="submit" style="background: #f06292; color: white; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer;">
+                        <i class="fas fa-save"></i> Lưu Sản Phẩm
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <script>
+            // Phần script này giữ nguyên vì nó dùng để xem trước (preview) ảnh vừa chọn từ máy tính
+            document.getElementById('fileImage').addEventListener('change', function(event) {
+                var file = event.target.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('thumbnail').setAttribute('src', e.target.result);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        </script>
+    </section>
+</body>
+</html>
